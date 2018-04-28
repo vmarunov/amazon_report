@@ -1,0 +1,37 @@
+
+[
+    ["ASSETS", [
+        ["Current assets", [
+            ["Cash and cash equivalents", [15890, 19334]],
+            ["Marketable securities", [3918, 6647]],
+            ["Inventories", [10243, 11461]],
+            ["Accounts receivable, net and other", [5654, 8339]]
+        ]],
+        ["Property and equipment, net", [21838, 29114]],
+        ["Goodwill", [3759, 3784]],
+        ["Other assets", [3445, 4723]]
+    ]],
+    ["LIABILITIES AND STOCKHOLDERS EQUITY", [
+        ["Current liabilities", [
+            ["Accounts payable", [20397, 25309]],
+            ["Accrued expenses and other", [10372, 13739]],
+            ["Unearned revenue", [3118, 4768]]
+        ]],
+        ["Long-term debt", [8227, 7694]],
+        ["Other long-term liabilities", [9249, 12607]],
+        ["Commitments and contingencies [Note 7]", [0, 0]],
+        ["Stockholders equity", [
+            ["Preferred stock, $0.01 par value", [0, 0]],
+            ["Authorized shares - 500", [0, 0]],
+            ["Issued and outstanding shares - none", [0, 0]],
+            ["Common stock, $0.01 par value", [0, 0]],
+            ["Authorized shares - 5,000", [0, 0]],
+            ["Issued shares - 494 and 500", [0, 0]],
+            ["Outstanding shares - 471 and 477", [5, 5]],
+            ["Treasury stock, at cost", [-1837, -1837]],
+            ["Additional paid-in capital", [13394, 17186]],
+            ["Accumulated other comprehensive loss", [-723, -985]],
+            ["Retained earnings", [2545, 4916]]
+        ]]
+    ]]
+]
