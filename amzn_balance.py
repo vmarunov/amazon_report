@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import json
+import pprint
 import sys
 import collections
 
@@ -65,7 +65,8 @@ def start(file_name):
             document = open_pdf(fp)
             els = search_balance_page(document)
             balance = BalancePage(els).get_balance()
-            print(json.dumps(balance, indent=4))
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(balance)
     except IOError:
         print('Unable to open file {}'.format(file_name))
 

@@ -2,6 +2,14 @@
 INDENT_CHARS = 2
 
 
+def dict_to_tuples(data):
+    if isinstance(data, dict):
+        return [
+            (key[1], dict_to_tuples(value))
+            for key, value in sorted(data.items())]
+    return data
+
+
 def is_filled(element):
     string = element.get_text().strip(' \n')
     return string != '' and string != '$'
@@ -30,18 +38,21 @@ def get_value(row, pos, is_num=False):
 class Balance(object):
 
     def __init__(self):
+        self.counter = 0
         self.data = dict()
         self.level = None
         self.chain = []
 
     def add_root(self, row):
-        name = get_value(row, 0)
+        name = (self.counter, get_value(row, 0))
+        self.counter += 1
         self.data[name] = dict()
         self.level = self.data[name]
         self.chain = []
 
     def add_level(self, row):
-        name = get_value(row, 0)
+        name = (self.counter, get_value(row, 0))
+        self.counter += 1
         self.chain.append(self.level)
         self.level[name] = dict()
         self.level = self.level[name]
@@ -51,8 +62,13 @@ class Balance(object):
             self.level = self.chain.pop(-1)
 
     def add_data(self, row):
-        self.level[get_value(row, 0)] = [
+        name = (self.counter, get_value(row, 0))
+        self.counter += 1
+        self.level[name] = [
             get_value(row, 1, True), get_value(row, 2, True)]
+
+    def get_balance(self):
+        return dict_to_tuples(self.data)
 
 
 class BalancePage(object):
@@ -89,10 +105,13 @@ class BalancePage(object):
                     self.get_indent(next_item)))
                 current = next_item
         except StopIteration:
-            pass
+            items[-1] = (items[-1][0], None, None, None)
 
         for row, next_row, indent, next_indent in items:
             data = self.get_data(row)
+            if next_row is None:
+                balance.add_data(data)
+                break
             next_data = self.get_data(next_row)
             if len(next_data) == 1 and self.is_center(next_row, center):
                 balance.add_data(data)
@@ -108,7 +127,7 @@ class BalancePage(object):
                 balance.remove_level()
                 continue
             balance.add_data(data)
-        return {'years': years, 'balance': balance.data}
+        return {'years': years, 'balance': balance.get_balance()}
 
     def _format(self):
         least_font_height = min(el.y1 - el.y0 for el in self.els)
