@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
 import sys
 import collections
 
@@ -22,7 +23,7 @@ def open_pdf(file_obj):
         return document
 
 
-def get_layout(document, page_no):
+def search_balance_page(document):
     laparams = LAParams(
         line_overlap=0.5,
         char_margin=1.0,
@@ -33,10 +34,17 @@ def get_layout(document, page_no):
     device = PDFPageAggregator(rsrcmgr, laparams=laparams)
     interpreter = PDFPageInterpreter(rsrcmgr, device)
     pages = list(PDFPage.create_pages(document))
-    page = pages[page_no - 1]
-    interpreter.process_page(page)
-    layout = device.get_result()
-    return layout
+    for n, page in enumerate(pages):
+        interpreter.process_page(page)
+        layout = device.get_result()
+        els = filter(
+            lambda el: el.get_text().strip(' \n') != '',
+            get_elements(layout, LTTextLineHorizontal))
+        if len(els) > 2 \
+                and els[0].get_text().startswith('AMAZON.COM, INC.') \
+                and els[1].get_text().startswith('CONSOLIDATED BALANCE SHEETS'):
+            return els
+    return None
 
 
 def get_elements(layout, clazz):
@@ -51,14 +59,13 @@ def get_elements(layout, clazz):
     return result
 
 
-def start(file_name, page):
+def start(file_name):
     try:
         with open(file_name, 'rb') as fp:
             document = open_pdf(fp)
-            layout = get_layout(document, page)
-            els = get_elements(layout, LTTextLineHorizontal)
+            els = search_balance_page(document)
             balance = BalancePage(els).get_balance()
-            print(balance)
+            print(json.dumps(balance, indent=4))
     except IOError:
         print('Unable to open file {}'.format(file_name))
 
@@ -67,9 +74,6 @@ if __name__ == '__main__':
     # 2014/50
     # 2015/51
     fn = 'data/AMZN_2016.pdf'
-    pg = 46
     if len(sys.argv) > 1:
         fn = sys.argv[1]
-    if len(sys.argv) > 2:
-        pg = int(sys.argv[2])
-    start(fn, pg)
+    start(fn)
