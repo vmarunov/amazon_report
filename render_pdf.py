@@ -63,7 +63,7 @@ def get_elements(layout, clazz):
 
 
 def render(layout, elements):
-    size = (layout.bbox[2], layout.bbox[3])
+    size = (int(layout.bbox[2]), int(layout.bbox[3]))
     height = size[1]
 
     img = Image.new('RGB', size, color='white')
@@ -84,8 +84,8 @@ def render(layout, elements):
 
 
 if __name__ == '__main__':
-    document = open_pdf("data/AMZN_2016.pdf")
-    layout = get_layout(document, 46)
+    document = open_pdf("data/AMZN_2017.pdf")
+    layout = get_layout(document, 50)
     els = get_elements(layout, LTTextLineHorizontal)
 
     # els = filter(lambda el: el.get_text().strip(' \n') != '', els)

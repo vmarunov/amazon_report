@@ -12,7 +12,7 @@ def dict_to_tuples(data):
 
 def is_filled(element):
     string = element.get_text().strip(' \n')
-    return string != '' and string != '$'
+    return string != '' and string != '$' and not string.startswith('(cid:')
 
 
 def to_num(value):
