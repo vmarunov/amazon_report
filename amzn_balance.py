@@ -72,8 +72,6 @@ def start(file_name):
 
 
 if __name__ == '__main__':
-    # 2014/50
-    # 2015/51
     fn = 'data/AMZN_2016.pdf'
     if len(sys.argv) > 1:
         fn = sys.argv[1]
