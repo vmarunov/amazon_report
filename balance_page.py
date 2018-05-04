@@ -29,7 +29,7 @@ def to_num(value):
 
 def get_value(row, pos, is_num=False):
     try:
-        value = row[pos].strip(' \n')
+        value = row[pos].strip(' \n:')
     except IndexError:
         value = ''
     return to_num(value) if is_num else value
@@ -37,13 +37,21 @@ def get_value(row, pos, is_num=False):
 
 class Balance(object):
 
-    def __init__(self):
+    def __init__(self, totals):
         self.counter = 0
         self.data = dict()
         self.level = None
         self.chain = []
+        self.totals = totals
+
+    def _total(self, name):
+        if name.upper() in self.totals:
+            data = self.totals[name.upper()]
+            del self.totals[name.upper()]
+            self.totals[name] = data
 
     def add_root(self, row):
+        self._total(get_value(row, 0))
         name = (self.counter, get_value(row, 0))
         self.counter += 1
         self.data[name] = dict()
@@ -51,6 +59,7 @@ class Balance(object):
         self.chain = []
 
     def add_level(self, row):
+        self._total(get_value(row, 0))
         name = (self.counter, get_value(row, 0))
         self.counter += 1
         self.chain.append(self.level)
@@ -70,6 +79,9 @@ class Balance(object):
     def get_balance(self):
         return dict_to_tuples(self.data)
 
+    def get_totals(self):
+        return self.totals.items()
+
 
 class BalancePage(object):
 
@@ -79,6 +91,7 @@ class BalancePage(object):
         self.y_accuracy = None
         self.x_min = None
         self.indent = None
+        self.totals = dict()
         self._format()
 
     def get_balance(self):
@@ -91,7 +104,7 @@ class BalancePage(object):
                 years = data
                 x_max = row['data'][0][0]
                 break
-        balance = Balance()
+        balance = Balance(self.totals)
         center = (x_max - self.x_min) / 2 + self.x_min
         items = []
         current = iterator.next()
@@ -127,7 +140,10 @@ class BalancePage(object):
                 balance.remove_level()
                 continue
             balance.add_data(data)
-        return {'years': years, 'balance': balance.get_balance()}
+        return {
+            'years': years,
+            'balance': balance.get_balance(),
+            'totals': balance.get_totals()}
 
     def _format(self):
         least_font_height = min(el.y1 - el.y0 for el in self.els)
@@ -157,6 +173,10 @@ class BalancePage(object):
                 _add_row(element)
             prev_element = element
 
+        self.totals = {
+            self.get_data(row)[0][6:].upper(): [
+                to_num(val) for val in self.get_data(row)[1:]]
+            for row in rows if self.get_data(row)[0].startswith('Total')}
         self.rows = [
             row for row in rows
             if not self.get_data(row)[0].startswith('Total')]
